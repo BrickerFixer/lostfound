@@ -2,13 +2,21 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import path from "path";
+import fs from "fs";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Serve static files from the uploads directory
+// Ensure uploads directory exists and serve static files from it
 const uploadsPath = path.join(process.cwd(), 'dist', 'public', 'uploads');
+
+// Create the uploads directory if it doesn't exist
+if (!fs.existsSync(uploadsPath)) {
+  console.log(`Creating uploads directory: ${uploadsPath}`);
+  fs.mkdirSync(uploadsPath, { recursive: true });
+}
+
 app.use('/uploads', express.static(uploadsPath));
 console.log(`Serving uploads from: ${uploadsPath}`);
 

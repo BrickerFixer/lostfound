@@ -43,10 +43,20 @@ export const insertUserSchema = createInsertSchema(users).pick({
   password: true,
 });
 
-export const insertItemSchema = createInsertSchema(items).omit({
+// Create a base insert schema
+const baseInsertItemSchema = createInsertSchema(items).omit({
   id: true,
   isReturned: true,
   dateCreated: true,
+});
+
+// Create a modified insert schema that properly handles form data submissions
+export const insertItemSchema = baseInsertItemSchema.transform((data) => {
+  // FormData sends everything as strings, so we need to transform some fields
+  return {
+    ...data,
+    // We don't need to transform anything else as all fields are strings
+  };
 });
 
 export const itemSearchSchema = z.object({

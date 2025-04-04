@@ -100,7 +100,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Image file is required" });
       }
 
-      // Ensure upload directory exists
+      // Ensure upload directory exists - do this synchronously before proceeding
       if (!fs.existsSync(uploadDir)) {
         console.log("Creating upload directory:", uploadDir);
         fs.mkdirSync(uploadDir, { recursive: true });
@@ -119,14 +119,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         size: req.file.size
       });
       
-      fs.writeFileSync(filePath, req.file.buffer);
-      console.log("File saved successfully");
+      try {
+        fs.writeFileSync(filePath, req.file.buffer);
+        console.log("File saved successfully");
+      } catch (fileError) {
+        console.error("Error saving file:", fileError);
+        return res.status(500).json({ message: "Failed to save uploaded file" });
+      }
       
       // Add image URL to the item data
       const imageUrl = `/uploads/${fileName}`;
-      const itemData = { ...req.body, imageUrl };
-      console.log("Prepared item data with image URL:", itemData);
-
+      
+      // Convert form fields to appropriate types
+      const itemData = {
+        ...req.body,
+        imageUrl
+      };
+      
+      console.log("Raw item data before validation:", itemData);
+      
       // Validate the item data
       const result = insertItemSchema.safeParse(itemData);
       

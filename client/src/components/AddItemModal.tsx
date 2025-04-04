@@ -24,8 +24,8 @@ interface AddItemModalProps {
   onClose: () => void;
 }
 
-// Extend schema to ensure image is required and text fields are properly validated
-const extendedSchema = insertItemSchema.extend({
+// Create a custom schema for form validation
+const extendedSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters"),
   description: z.string().min(10, "Description must be at least 10 characters"),
   location: z.string().min(3, "Location must be at least 3 characters"),
@@ -74,15 +74,27 @@ export default function AddItemModal({ isOpen, onClose }: AddItemModalProps) {
       
       console.log("Submitting form data with FormData...");
       
+      // Just log that we're submitting form data
+      console.log("Form data ready for submission with the following fields:", 
+        Object.keys(data).map(key => key).join(", ") + ", image");
+      
       const response = await fetch("/api/items", {
         method: "POST",
         body: formData,
+        // Important: Do NOT set Content-Type header when using FormData
+        // The browser will automatically set the correct Content-Type with boundary
       });
       
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Server returned error:", errorData);
-        throw new Error(errorData.message || "Failed to create item");
+        let errorMessage = "Failed to create item";
+        try {
+          const errorData = await response.json();
+          console.error("Server returned error:", errorData);
+          errorMessage = errorData.message || errorMessage;
+        } catch (parseError) {
+          console.error("Could not parse error response:", parseError);
+        }
+        throw new Error(errorMessage);
       }
       
       const result = await response.json();
