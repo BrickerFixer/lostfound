@@ -13,7 +13,7 @@ export default function SearchBar({ searchQuery, setSearchQuery }: SearchBarProp
       <div className="relative">
         <Input
           type="text"
-          placeholder="Search for items..."
+          placeholder="Поиск предметов..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full bg-gray-100 border-none rounded-lg pl-10 pr-4 py-2"

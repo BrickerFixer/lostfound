@@ -19,11 +19,11 @@ export default function ItemCard({ item }: ItemCardProps) {
       </div>
       <CardContent className="p-4">
         <h3 className="text-lg font-semibold">{item.name}</h3>
-        <p className="text-sm text-gray-500 mt-1">Found: {item.location}</p>
-        <p className="text-sm text-gray-500">Date: {item.dateFound}</p>
+        <p className="text-sm text-gray-500 mt-1">Найдено: {item.location}</p>
+        <p className="text-sm text-gray-500">Дата: {item.dateFound}</p>
         <Link href={`/items/${item.id}`}>
           <Button className="mt-3 w-full">
-            View Details
+            Посмотреть детали
           </Button>
         </Link>
       </CardContent>

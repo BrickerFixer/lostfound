@@ -34,8 +34,8 @@ export default function ItemDetails() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/items"] });
       toast({
-        title: "Success!",
-        description: "Item return confirmed! The listing will be removed.",
+        title: "Успех!",
+        description: "Возврат предмета подтвержден! Объявление будет удалено.",
         variant: "default",
       });
       setIsContactModalOpen(false);
@@ -45,8 +45,8 @@ export default function ItemDetails() {
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to confirm item return. Please try again.",
+        title: "Ошибка",
+        description: "Не удалось подтвердить возврат предмета. Пожалуйста, попробуйте снова.",
         variant: "destructive",
       });
     }
@@ -106,8 +106,8 @@ export default function ItemDetails() {
     return (
       <div className="fixed inset-0 bg-white z-50 overflow-y-auto">
         <div className="p-6 text-center">
-          <p className="text-red-500 mb-4">Failed to load item details</p>
-          <Button onClick={() => setLocation("/")}>Go Back Home</Button>
+          <p className="text-red-500 mb-4">Не удалось загрузить информацию о предмете</p>
+          <Button onClick={() => setLocation("/")}>Вернуться на главную</Button>
         </div>
       </div>
     );
@@ -137,23 +137,23 @@ export default function ItemDetails() {
           
           <div className="mt-4 space-y-3">
             <div>
-              <h4 className="text-sm font-medium text-gray-500">Description</h4>
+              <h4 className="text-sm font-medium text-gray-500">Описание</h4>
               <p className="mt-1">{item.description}</p>
             </div>
             
             <div>
-              <h4 className="text-sm font-medium text-gray-500">Found Location</h4>
+              <h4 className="text-sm font-medium text-gray-500">Место находки</h4>
               <p className="mt-1">{item.location}</p>
             </div>
             
             <div>
-              <h4 className="text-sm font-medium text-gray-500">Date Found</h4>
+              <h4 className="text-sm font-medium text-gray-500">Дата находки</h4>
               <p className="mt-1">{item.dateFound}</p>
             </div>
             
             {item.additionalInfo && (
               <div>
-                <h4 className="text-sm font-medium text-gray-500">Additional Info</h4>
+                <h4 className="text-sm font-medium text-gray-500">Дополнительная информация</h4>
                 <p className="mt-1">{item.additionalInfo}</p>
               </div>
             )}
@@ -163,7 +163,7 @@ export default function ItemDetails() {
               onClick={handleClaim}
               disabled={item.isReturned}
             >
-              {item.isReturned ? "Item Already Returned" : "I Lost This Item"}
+              {item.isReturned ? "Предмет уже возвращен" : "Я потерял этот предмет"}
             </Button>
           </div>
         </div>

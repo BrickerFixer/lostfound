@@ -46,12 +46,12 @@ export default function Home() {
           </div>
         ) : isError ? (
           <div className="text-center py-10">
-            <p className="text-red-500 mb-4">Something went wrong while loading items</p>
+            <p className="text-red-500 mb-4">Произошла ошибка при загрузке предметов</p>
             <Button 
               variant="outline" 
               onClick={() => window.location.reload()}
             >
-              Try Again
+              Попробовать снова
             </Button>
           </div>
         ) : items && items.length > 0 ? (
@@ -62,12 +62,12 @@ export default function Home() {
           </div>
         ) : (
           <div className="text-center py-10">
-            <p className="text-gray-500 mb-4">No items found</p>
+            <p className="text-gray-500 mb-4">Предметы не найдены</p>
             <Button 
               variant="outline" 
               onClick={() => setIsAddModalOpen(true)}
             >
-              Report a Found Item
+              Сообщить о находке
             </Button>
           </div>
         )}

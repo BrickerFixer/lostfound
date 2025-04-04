@@ -84,13 +84,13 @@ export function FileUpload({ onFileSelect, selectedFile }: FileUploadProps) {
             <X className="w-4 h-4" />
           </Button>
           <p className="text-sm text-gray-500 mt-2">
-            {selectedFile?.name} ({selectedFile && typeof selectedFile.size === 'number' ? (selectedFile.size / 1024 / 1024).toFixed(2) : '0'} MB)
+            {selectedFile?.name} ({selectedFile && typeof selectedFile.size === 'number' ? (selectedFile.size / 1024 / 1024).toFixed(2) : '0'} МБ)
           </p>
         </div>
       ) : (
         <div className="space-y-2 p-6">
           <ImageIcon className="mx-auto w-12 h-12 text-gray-400" />
-          <p className="text-sm text-gray-500">Click to upload or drag and drop</p>
+          <p className="text-sm text-gray-500">Нажмите для загрузки или перетащите файл</p>
         </div>
       )}
     </div>

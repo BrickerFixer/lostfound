@@ -26,13 +26,13 @@ interface AddItemModalProps {
 
 // Create a custom schema for form validation
 const extendedSchema = z.object({
-  name: z.string().min(3, "Name must be at least 3 characters"),
-  description: z.string().min(10, "Description must be at least 10 characters"),
-  location: z.string().min(3, "Location must be at least 3 characters"),
-  dateFound: z.string().min(1, "Date found is required"),
-  finderName: z.string().min(3, "Your name must be at least 3 characters"),
-  finderPhone: z.string().min(10, "Please enter a valid phone number"),
-  finderEmail: z.string().email("Please enter a valid email address"),
+  name: z.string().min(3, "Название должно содержать минимум 3 символа"),
+  description: z.string().min(10, "Описание должно содержать минимум 10 символов"),
+  location: z.string().min(3, "Место находки должно содержать минимум 3 символа"),
+  dateFound: z.string().min(1, "Дата находки обязательна"),
+  finderName: z.string().min(3, "Ваше имя должно содержать минимум 3 символа"),
+  finderPhone: z.string().min(10, "Пожалуйста, введите корректный номер телефона"),
+  finderEmail: z.string().email("Пожалуйста, введите корректный email"),
   additionalInfo: z.string().optional(),
 });
 
@@ -57,7 +57,7 @@ export default function AddItemModal({ isOpen, onClose }: AddItemModalProps) {
   const addItemMutation = useMutation({
     mutationFn: async (data: z.infer<typeof extendedSchema>) => {
       if (!selectedImage) {
-        throw new Error("Image is required");
+        throw new Error("Необходимо загрузить изображение");
       }
 
       const formData = new FormData();
@@ -86,7 +86,7 @@ export default function AddItemModal({ isOpen, onClose }: AddItemModalProps) {
       });
       
       if (!response.ok) {
-        let errorMessage = "Failed to create item";
+        let errorMessage = "Не удалось создать запись";
         try {
           const errorData = await response.json();
           console.error("Server returned error:", errorData);
@@ -104,8 +104,8 @@ export default function AddItemModal({ isOpen, onClose }: AddItemModalProps) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/items"] });
       toast({
-        title: "Success!",
-        description: "Item successfully added to the lost & found board!",
+        title: "Успех!",
+        description: "Предмет успешно добавлен на доску находок!",
       });
       onClose();
       form.reset();
@@ -114,8 +114,8 @@ export default function AddItemModal({ isOpen, onClose }: AddItemModalProps) {
     onError: (error) => {
       console.error("Mutation error:", error);
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "An error occurred",
+        title: "Ошибка",
+        description: error instanceof Error ? error.message : "Произошла ошибка",
         variant: "destructive",
       });
     },
@@ -124,8 +124,8 @@ export default function AddItemModal({ isOpen, onClose }: AddItemModalProps) {
   const onSubmit = async (data: z.infer<typeof extendedSchema>) => {
     if (!selectedImage) {
       toast({
-        title: "Error",
-        description: "Please upload an image of the item",
+        title: "Ошибка",
+        description: "Пожалуйста, загрузите изображение предмета",
         variant: "destructive",
       });
       return;
@@ -148,7 +148,7 @@ export default function AddItemModal({ isOpen, onClose }: AddItemModalProps) {
       <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between mb-2">
-            <DialogTitle className="text-xl font-bold">Found an Item?</DialogTitle>
+            <DialogTitle className="text-xl font-bold">Нашли предмет?</DialogTitle>
             <Button 
               variant="ghost" 
               size="icon" 
@@ -167,10 +167,10 @@ export default function AddItemModal({ isOpen, onClose }: AddItemModalProps) {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Item Name</FormLabel>
+                  <FormLabel>Название предмета</FormLabel>
                   <FormControl>
                     <Input 
-                      placeholder="E.g. Wallet, Headphones, Keys" 
+                      placeholder="Например: кошелек, наушники, ключи" 
                       {...field} 
                     />
                   </FormControl>
@@ -180,14 +180,14 @@ export default function AddItemModal({ isOpen, onClose }: AddItemModalProps) {
             />
 
             <div>
-              <FormLabel className="block text-sm font-medium mb-1">Item Photo</FormLabel>
+              <FormLabel className="block text-sm font-medium mb-1">Фото предмета</FormLabel>
               <FileUpload 
                 onFileSelect={(file) => setSelectedImage(file)} 
                 selectedFile={selectedImage}
               />
               {form.formState.isSubmitted && !selectedImage && (
                 <p className="text-sm font-medium text-destructive mt-1">
-                  Please upload an image of the item
+                  Пожалуйста, загрузите изображение предмета
                 </p>
               )}
             </div>
@@ -197,10 +197,10 @@ export default function AddItemModal({ isOpen, onClose }: AddItemModalProps) {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>Описание</FormLabel>
                   <FormControl>
                     <Textarea 
-                      placeholder="Color, brand, condition, any identifying features..." 
+                      placeholder="Цвет, фирма, состояние, отличительные особенности..." 
                       {...field} 
                       rows={3}
                     />
@@ -215,10 +215,10 @@ export default function AddItemModal({ isOpen, onClose }: AddItemModalProps) {
               name="location"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Where Found</FormLabel>
+                  <FormLabel>Где найдено</FormLabel>
                   <FormControl>
                     <Input 
-                      placeholder="E.g. Central Park, Main Street Bus Stop" 
+                      placeholder="Например: Центральный парк, остановка на Главной улице" 
                       {...field} 
                     />
                   </FormControl>
@@ -232,7 +232,7 @@ export default function AddItemModal({ isOpen, onClose }: AddItemModalProps) {
               name="dateFound"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Date Found</FormLabel>
+                  <FormLabel>Дата находки</FormLabel>
                   <FormControl>
                     <Input 
                       type="date" 
@@ -250,10 +250,10 @@ export default function AddItemModal({ isOpen, onClose }: AddItemModalProps) {
               name="additionalInfo"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Additional Info (Optional)</FormLabel>
+                  <FormLabel>Дополнительная информация (необязательно)</FormLabel>
                   <FormControl>
                     <Textarea 
-                      placeholder="Any other details that might help identify the owner..." 
+                      placeholder="Любые другие детали, которые могут помочь идентифицировать владельца..." 
                       {...field} 
                       rows={2}
                     />
@@ -264,9 +264,9 @@ export default function AddItemModal({ isOpen, onClose }: AddItemModalProps) {
             />
             
             <div className="pt-4 border-t border-gray-200">
-              <h4 className="text-lg font-medium">Your Contact Information</h4>
+              <h4 className="text-lg font-medium">Ваша контактная информация</h4>
               <p className="text-sm text-gray-500 mt-1">
-                This will only be shared with the person who claims the item
+                Будет доступна только человеку, который заявит о своих правах на эту вещь
               </p>
               
               <div className="mt-3 space-y-4">
@@ -275,7 +275,7 @@ export default function AddItemModal({ isOpen, onClose }: AddItemModalProps) {
                   name="finderName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Your Name</FormLabel>
+                      <FormLabel>Ваше имя</FormLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
@@ -289,7 +289,7 @@ export default function AddItemModal({ isOpen, onClose }: AddItemModalProps) {
                   name="finderPhone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone Number</FormLabel>
+                      <FormLabel>Номер телефона</FormLabel>
                       <FormControl>
                         <Input type="tel" {...field} />
                       </FormControl>
@@ -319,7 +319,7 @@ export default function AddItemModal({ isOpen, onClose }: AddItemModalProps) {
               className="w-full py-3 mt-6"
               disabled={addItemMutation.isPending}
             >
-              {addItemMutation.isPending ? "Submitting..." : "Submit Found Item"}
+              {addItemMutation.isPending ? "Отправка..." : "Отправить информацию о находке"}
             </Button>
           </form>
         </Form>

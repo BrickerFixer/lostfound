@@ -19,7 +19,7 @@ export default function Header({
   return (
     <header className="bg-white shadow-sm sticky top-0 z-10">
       <div className="flex justify-between items-center px-4 py-3 border-b">
-        <h1 className="text-xl font-bold">Findee</h1>
+        <h1 className="text-xl font-bold">Потеряшка</h1>
         <div className="flex gap-2">
           <Button 
             variant="ghost" 
