@@ -1,20 +1,7 @@
-import { pgTable, text, serial, integer, boolean, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, boolean, timestamp } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
-
-export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
-});
-
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
-});
-
-export type InsertUser = z.infer<typeof insertUserSchema>;
-export type User = typeof users.$inferSelect;
 
 // Lost and found item schema
 export const items = pgTable("items", {
@@ -32,6 +19,30 @@ export const items = pgTable("items", {
   dateCreated: timestamp("date_created").defaultNow().notNull(),
 });
 
+// Users table
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  username: text("username").notNull().unique(),
+  password: text("password").notNull(),
+});
+
+// For now, we'll comment out the relations as they're not needed yet
+// We can implement proper relations when we have user authentication
+/*
+export const usersRelations = relations(users, ({ many }) => ({
+  items: many(items),
+}));
+
+export const itemsRelations = relations(items, ({ one }) => ({
+  finder: one(users),
+}));
+*/
+
+export const insertUserSchema = createInsertSchema(users).pick({
+  username: true,
+  password: true,
+});
+
 export const insertItemSchema = createInsertSchema(items).omit({
   id: true,
   isReturned: true,
@@ -46,6 +57,8 @@ export const itemReturnSchema = z.object({
   id: z.number(),
 });
 
+export type InsertUser = z.infer<typeof insertUserSchema>;
+export type User = typeof users.$inferSelect;
 export type InsertItem = z.infer<typeof insertItemSchema>;
 export type Item = typeof items.$inferSelect;
 export type ItemSearch = z.infer<typeof itemSearchSchema>;

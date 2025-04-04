@@ -1,4 +1,6 @@
 import { items, type Item, type InsertItem } from "@shared/schema";
+import { db } from "./db";
+import { eq, or, and, ilike, not, desc } from "drizzle-orm";
 
 export interface IStorage {
   getItems(): Promise<Item[]>;
@@ -8,66 +10,73 @@ export interface IStorage {
   markItemAsReturned(id: number): Promise<Item | undefined>;
 }
 
-export class MemStorage implements IStorage {
-  private items: Map<number, Item>;
-  private currentId: number;
-
-  constructor() {
-    this.items = new Map();
-    this.currentId = 1;
-  }
-
+export class DatabaseStorage implements IStorage {
   async getItems(): Promise<Item[]> {
-    return Array.from(this.items.values())
-      .filter(item => !item.isReturned)
-      .sort((a, b) => (b.dateCreated?.getTime() || 0) - (a.dateCreated?.getTime() || 0));
+    return db
+      .select()
+      .from(items)
+      .where(eq(items.isReturned, false))
+      .orderBy(desc(items.dateCreated));
   }
 
   async getItem(id: number): Promise<Item | undefined> {
-    return this.items.get(id);
+    const result = await db
+      .select()
+      .from(items)
+      .where(eq(items.id, id));
+    
+    return result.length > 0 ? result[0] : undefined;
   }
 
   async searchItems(query: string): Promise<Item[]> {
-    if (!query) {
+    if (!query || query.trim() === "") {
       return this.getItems();
     }
     
-    const lowercaseQuery = query.toLowerCase();
-    
-    return Array.from(this.items.values())
-      .filter(item => !item.isReturned && 
-        (item.name.toLowerCase().includes(lowercaseQuery) || 
-         item.description.toLowerCase().includes(lowercaseQuery) || 
-         item.location.toLowerCase().includes(lowercaseQuery)))
-      .sort((a, b) => (b.dateCreated?.getTime() || 0) - (a.dateCreated?.getTime() || 0));
+    return db
+      .select()
+      .from(items)
+      .where(
+        and(
+          eq(items.isReturned, false),
+          or(
+            ilike(items.name, `%${query}%`),
+            ilike(items.description, `%${query}%`),
+            ilike(items.location, `%${query}%`)
+          )
+        )
+      )
+      .orderBy(desc(items.dateCreated));
   }
 
   async createItem(insertItem: InsertItem): Promise<Item> {
-    const id = this.currentId++;
-    const now = new Date();
+    const result = await db
+      .insert(items)
+      .values({
+        ...insertItem,
+        isReturned: false,
+        dateCreated: new Date()
+      })
+      .returning();
     
-    const item: Item = { 
-      ...insertItem, 
-      id, 
-      isReturned: false, 
-      dateCreated: now
-    };
-    
-    this.items.set(id, item);
-    return item;
+    return result[0];
   }
 
   async markItemAsReturned(id: number): Promise<Item | undefined> {
-    const item = this.items.get(id);
+    const item = await this.getItem(id);
     
-    if (item) {
-      const updatedItem = { ...item, isReturned: true };
-      this.items.set(id, updatedItem);
-      return updatedItem;
+    if (!item) {
+      return undefined;
     }
     
-    return undefined;
+    const result = await db
+      .update(items)
+      .set({ isReturned: true })
+      .where(eq(items.id, id))
+      .returning();
+    
+    return result.length > 0 ? result[0] : undefined;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
