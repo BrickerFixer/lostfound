@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ImageIcon, X } from "lucide-react";
 
 interface FileUploadProps {
-  onFileSelect: (file: File) => void;
+  onFileSelect: (file: File | null) => void;
   selectedFile: File | null;
 }
 
@@ -42,7 +42,7 @@ export function FileUpload({ onFileSelect, selectedFile }: FileUploadProps) {
   };
 
   const removeFile = () => {
-    onFileSelect(null as any);
+    onFileSelect(null);
     setPreview(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -84,7 +84,7 @@ export function FileUpload({ onFileSelect, selectedFile }: FileUploadProps) {
             <X className="w-4 h-4" />
           </Button>
           <p className="text-sm text-gray-500 mt-2">
-            {selectedFile?.name} ({(selectedFile?.size / 1024 / 1024).toFixed(2)} MB)
+            {selectedFile?.name} ({selectedFile && typeof selectedFile.size === 'number' ? (selectedFile.size / 1024 / 1024).toFixed(2) : '0'} MB)
           </p>
         </div>
       ) : (

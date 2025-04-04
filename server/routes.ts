@@ -7,13 +7,18 @@ import path from "path";
 import fs from "fs";
 import { nanoid } from "nanoid";
 
+// Add multer types for Request
+interface MulterRequest extends Request {
+  file?: Express.Multer.File;
+}
+
 // Configure multer for in-memory file storage
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
     fileSize: 5 * 1024 * 1024, // 5MB limit
   },
-  fileFilter: (_req, file, callback) => {
+  fileFilter: (_req: any, file: Express.Multer.File, callback: multer.FileFilterCallback) => {
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
     if (allowedTypes.includes(file.mimetype)) {
       callback(null, true);
@@ -83,10 +88,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create a new item
-  app.post("/api/items", upload.single('image'), async (req: Request, res: Response) => {
+  app.post("/api/items", upload.single('image'), async (req: MulterRequest, res: Response) => {
     try {
+      console.log("Received item creation request:", {
+        file: req.file ? "File present" : "No file",
+        body: req.body,
+      });
+      
       if (!req.file) {
+        console.error("No file uploaded in the request");
         return res.status(400).json({ message: "Image file is required" });
+      }
+
+      // Ensure upload directory exists
+      if (!fs.existsSync(uploadDir)) {
+        console.log("Creating upload directory:", uploadDir);
+        fs.mkdirSync(uploadDir, { recursive: true });
       }
 
       // Save the file with a unique name
@@ -94,16 +111,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const fileName = `${nanoid()}${fileExt}`;
       const filePath = path.join(uploadDir, fileName);
       
+      console.log("Saving uploaded file:", {
+        fileName,
+        filePath,
+        originalName: req.file.originalname,
+        mimeType: req.file.mimetype,
+        size: req.file.size
+      });
+      
       fs.writeFileSync(filePath, req.file.buffer);
+      console.log("File saved successfully");
       
       // Add image URL to the item data
       const imageUrl = `/uploads/${fileName}`;
       const itemData = { ...req.body, imageUrl };
+      console.log("Prepared item data with image URL:", itemData);
 
       // Validate the item data
       const result = insertItemSchema.safeParse(itemData);
       
       if (!result.success) {
+        console.error("Invalid item data:", result.error.errors);
         // Remove the uploaded file
         fs.unlinkSync(filePath);
         return res.status(400).json({ 
@@ -113,7 +141,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Create the item
+      console.log("Creating item in storage...");
       const item = await storage.createItem(result.data);
+      console.log("Item created successfully:", item);
       res.status(201).json(item);
     } catch (error) {
       console.error("Error creating item:", error);

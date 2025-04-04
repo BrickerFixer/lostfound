@@ -65,12 +65,14 @@ export default function AddItemModal({ isOpen, onClose }: AddItemModalProps) {
       // Append item data
       Object.entries(data).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
-          formData.append(key, value);
+          formData.append(key, String(value));
         }
       });
       
       // Append image file
       formData.append("image", selectedImage);
+      
+      console.log("Submitting form data with FormData...");
       
       const response = await fetch("/api/items", {
         method: "POST",
@@ -79,10 +81,13 @@ export default function AddItemModal({ isOpen, onClose }: AddItemModalProps) {
       
       if (!response.ok) {
         const errorData = await response.json();
+        console.error("Server returned error:", errorData);
         throw new Error(errorData.message || "Failed to create item");
       }
       
-      return response.json();
+      const result = await response.json();
+      console.log("Form submission successful:", result);
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/items"] });
@@ -95,6 +100,7 @@ export default function AddItemModal({ isOpen, onClose }: AddItemModalProps) {
       setSelectedImage(null);
     },
     onError: (error) => {
+      console.error("Mutation error:", error);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "An error occurred",
@@ -103,7 +109,7 @@ export default function AddItemModal({ isOpen, onClose }: AddItemModalProps) {
     },
   });
 
-  const onSubmit = (data: z.infer<typeof extendedSchema>) => {
+  const onSubmit = async (data: z.infer<typeof extendedSchema>) => {
     if (!selectedImage) {
       toast({
         title: "Error",
@@ -113,7 +119,13 @@ export default function AddItemModal({ isOpen, onClose }: AddItemModalProps) {
       return;
     }
     
-    addItemMutation.mutate(data);
+    // Use the mutation to submit the form
+    try {
+      await addItemMutation.mutateAsync(data);
+    } catch (error) {
+      // Error is already handled in mutation's onError
+      console.error("Form submission error caught in submit handler:", error);
+    }
   };
 
   // Prepare today's date for max date constraint

@@ -1,10 +1,16 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import path from "path";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// Serve static files from the uploads directory
+const uploadsPath = path.join(process.cwd(), 'dist', 'public', 'uploads');
+app.use('/uploads', express.static(uploadsPath));
+console.log(`Serving uploads from: ${uploadsPath}`);
 
 app.use((req, res, next) => {
   const start = Date.now();
