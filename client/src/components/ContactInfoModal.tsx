@@ -22,7 +22,7 @@ export default function ContactInfoModal({
 }: ContactInfoModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
         <h3 className="text-xl font-bold">Contact Information</h3>
         
         <div className="mt-4 space-y-3">

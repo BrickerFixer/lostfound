@@ -13,7 +13,7 @@ interface WarningModalProps {
 export default function WarningModal({ isOpen, onClose, onConfirm }: WarningModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="bg-gray-900 text-white p-6 sm:max-w-md">
+      <DialogContent className="bg-gray-900 text-white p-6 sm:max-w-md max-h-[90vh] overflow-y-auto">
         <h3 className="text-xl font-bold text-center">Important Notice</h3>
         
         <div className="mt-6 space-y-4">
