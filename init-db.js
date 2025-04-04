@@ -5,7 +5,8 @@
  */
 
 // Load environment variables from .env file
-require('dotenv').config();
+import 'dotenv/config';
+import { spawn } from 'child_process';
 
 // Make sure DATABASE_URL is set
 if (!process.env.DATABASE_URL) {
@@ -22,7 +23,6 @@ console.log("\nRunning the following command:");
 console.log("npx drizzle-kit push");
 
 // Use child_process to execute the drizzle-kit push command
-const { spawn } = require('child_process');
 const child = spawn('npx', ['drizzle-kit', 'push']);
 
 child.stdout.on('data', (data) => {
